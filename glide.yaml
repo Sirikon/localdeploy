@@ -1,0 +1,3 @@
+package: github.com/Sirikon/localdeploy
+import:
+- package: github.com/gin-gonic/gin
