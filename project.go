@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"io"
+	"github.com/urfave/cli"
 )
 
 const Workspace = "/srv/molly"
@@ -22,11 +23,25 @@ type ProjectConfig struct {
 	Service string
 }
 
+func CreateProject(name string) error {
+
+}
+
 func GetProjectByName(name string, project *Project) error {
 	project.Name = name
 	if err := project.LoadConfig(); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (p *Project) CreateFilesFolder() error {
+	filesFolder := Workspace + "/" + p.Name + "/files"
+
+	if err := os.MkdirAll(filesFolder, 0777); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -37,11 +52,7 @@ func (p *Project) CleanFilesFolder() error {
 		return err
 	}
 
-	if err := os.Mkdir(filesFolder, 0777); err != nil {
-		return err
-	}
-
-	return nil
+	return p.CreateFilesFolder()
 }
 
 func (p *Project) GetEnvVars() []string {
@@ -86,6 +97,24 @@ func (p *Project) StoreArtifact(fileReader io.Reader) error {
 	return nil
 }
 
+func (p *Project) SaveConfig() error {
+	projectFilePath := Workspace + "/" + p.Name + "/project.yml"
+
+	var projectFileBytes []byte
+
+	if out, err := yaml.Marshal(p.Config); err != nil {
+		return err
+	} else {
+		projectFileBytes = out
+	}
+
+	if err := ioutil.WriteFile(projectFilePath, projectFileBytes, 0777); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *Project) LoadConfig() error {
 	projectFilePath := Workspace + "/" + p.Name + "/project.yml"
 
@@ -115,5 +144,27 @@ func (p *Project) RestartService() error {
 		fmt.Println(string(out))
 		return err
 	}
+	return nil
+}
+
+func AddProjectAction(c *cli.Context) error {
+
+	projectName := c.Args().First()
+
+	project := Project{
+		Name: projectName,
+		Config: ProjectConfig{
+			Name: projectName,
+			Token: "lalala",
+			Service: projectName,
+		},
+	}
+	if err := project.CreateFilesFolder(); err != nil {
+		return err
+	}
+	if err := project.SaveConfig(); err != nil {
+		return err
+	}
+
 	return nil
 }
