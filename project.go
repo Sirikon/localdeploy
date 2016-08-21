@@ -23,10 +23,6 @@ type ProjectConfig struct {
 	Service string
 }
 
-func CreateProject(name string) error {
-
-}
-
 func GetProjectByName(name string, project *Project) error {
 	project.Name = name
 	if err := project.LoadConfig(); err != nil {
