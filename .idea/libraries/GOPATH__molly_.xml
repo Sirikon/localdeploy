@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="GOPATH &lt;localdeploy&gt;">
+  <library name="GOPATH &lt;molly&gt;">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/../.." />
       <root url="file://$PROJECT_DIR$/../../../gopkg.in" />

@@ -6,5 +6,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="GOPATH &lt;localdeploy&gt;" level="project" />
+    <orderEntry type="library" name="GOPATH &lt;molly&gt;" level="project" />
   </component>
 </module>
