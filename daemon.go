@@ -10,23 +10,20 @@ import (
 func ActionDaemon(c *cli.Context) error {
 	router := gin.Default()
 
-	router.POST("/upload/:project", func(c *gin.Context) {
+	router.POST("/deploy", func(c *gin.Context) {
 
 		project := &Project{}
 
-		if err := GetProjectByName(c.Param("project"), project); err != nil {
+		if err := GetProjectByName(c.PostForm("project"), project); err != nil {
 			c.String(400, "Specified project doesn't exist\n")
 			fmt.Println(err)
 			return
 		}
 
-		token := c.Query("token")
-		validProjectToken := project.Config.Token
+		token := c.PostForm("token")
 
-		if token != validProjectToken || validProjectToken == "" {
+		if !project.CheckToken(token) {
 			c.String(400, "Wrong token\n")
-			fmt.Println(validProjectToken)
-			fmt.Println(token)
 			return
 		}
 

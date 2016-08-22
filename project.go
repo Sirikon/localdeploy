@@ -9,6 +9,8 @@ import (
 	"io"
 	"github.com/urfave/cli"
 	"os/user"
+	"math/rand"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const Workspace = "/srv/molly"
@@ -171,15 +173,47 @@ func (p *Project) RestartService() error {
 	return nil
 }
 
-func AddProjectAction(c *cli.Context) error {
+func GenerateRandomPassword() string {
+	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 
+	b := make([]rune, 32)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func HashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashedPassword), nil
+}
+
+func (p *Project) CheckToken(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(p.Config.Token), []byte(password))
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func AddProjectAction(c *cli.Context) error {
 	projectName := c.Args().First()
+
+	randomPassword := GenerateRandomPassword()
+	hashedPassword, err := HashPassword(randomPassword)
+
+	if err != nil {
+		return err
+	}
 
 	project := Project{
 		Name: projectName,
 		Config: ProjectConfig{
 			Name: projectName,
-			Token: "lalala",
+			Token: hashedPassword,
 			Service: "molly-" + projectName,
 		},
 	}
@@ -200,6 +234,8 @@ func AddProjectAction(c *cli.Context) error {
 	if err := project.SaveConfig(); err != nil {
 		return err
 	}
+
+	fmt.Println("Automatically generated token:", randomPassword)
 
 	return nil
 }

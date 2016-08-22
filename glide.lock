@@ -1,5 +1,5 @@
-hash: b2b123b5b913a65d7a56481d37d298a6f725550a323d64e7b6a0e576e7ace54b
-updated: 2016-08-21T20:28:22.803933585+02:00
+hash: 313b01be189954b2dd917af320dd8c17553755a66c6a196f238a59c3336de971
+updated: 2016-08-22T22:56:42.678277223+02:00
 imports:
 - name: github.com/gin-gonic/gin
   version: f931d1ea80ae95a6fc739213cdd9399bd2967fb6
@@ -14,6 +14,11 @@ imports:
   version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
 - name: github.com/urfave/cli
   version: 1efa31f08b9333f1bd4882d61f9d668a70cd902e
+- name: golang.org/x/crypto
+  version: b35ccbc95a0eaae49fb65c5d627cb7149ed8d1ab
+  subpackages:
+  - bcrypt
+  - blowfish
 - name: golang.org/x/net
   version: f315505cf3349909cdf013ea56690da34e96a451
   subpackages:
