@@ -43,3 +43,4 @@ _testmain.go
 # Golang
 vendor/
 .glide/
+molly

@@ -11,6 +11,7 @@ import (
 	"os/user"
 	"math/rand"
 	"golang.org/x/crypto/bcrypt"
+	"errors"
 )
 
 const Workspace = "/srv/molly"
@@ -29,7 +30,7 @@ type ProjectConfig struct {
 func GetProjectByName(name string, project *Project) error {
 	project.Name = name
 	if err := project.LoadConfig(); err != nil {
-		return err
+		return errors.New("Specified project doesn't exist")
 	}
 	return nil
 }
@@ -62,7 +63,7 @@ func (p *Project) GetEnvVars() []string {
 
 func (p *Project) RunDeploymentScript() error {
 	if err := p.CleanFilesFolder(); err != nil {
-		return err
+		return errors.New("Couldn't clean the files folder: " + err.Error())
 	}
 
 	cmd := exec.Command("sh", Workspace + "/" + p.Name + "/deploy.sh")
@@ -71,8 +72,7 @@ func (p *Project) RunDeploymentScript() error {
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println(string(out))
-		return err
+		return errors.New("There was an error running the deployment script: " + err.Error() + "\n" + string(out))
 	}
 
 	return nil
@@ -90,7 +90,7 @@ func (p *Project) StoreArtifact(fileReader io.Reader) error {
 	var artifactFile *os.File
 
 	if out, err := os.Create(Workspace + "/" + p.Name + "/artifact.zip"); err != nil {
-		return err
+		return errors.New("Couldn't create the artifact file: "  + err.Error())
 	} else {
 		artifactFile = out
 	}
@@ -98,7 +98,7 @@ func (p *Project) StoreArtifact(fileReader io.Reader) error {
 	defer artifactFile.Close()
 
 	if _, err := io.Copy(artifactFile, fileReader); err != nil {
-		return err
+		return errors.New("Couldn't copy the artifact file to destiny: "  + err.Error())
 	}
 
 	return nil
@@ -167,8 +167,7 @@ func (p *Project) RestartService() error {
 	cmd := exec.Command("/usr/sbin/service", p.Config.Service, "restart")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println(string(out))
-		return err
+		return errors.New("There was an error while trying to restart the service: " + err.Error() + "\n" + string(out))
 	}
 	return nil
 }

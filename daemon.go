@@ -1,65 +1,59 @@
 package main
 
 import (
-	"fmt"
 	"mime/multipart"
 	"github.com/urfave/cli"
 	"github.com/gin-gonic/gin"
+	"errors"
 )
 
 func ActionDaemon(c *cli.Context) error {
 	router := gin.Default()
 
-	router.POST("/deploy", func(c *gin.Context) {
+	router.POST("/deploy", func(req *gin.Context) {
 
 		project := &Project{}
-
-		if err := GetProjectByName(c.PostForm("project"), project); err != nil {
-			c.String(400, "Specified project doesn't exist\n")
-			fmt.Println(err)
-			return
-		}
-
-		token := c.PostForm("token")
-
-		if !project.CheckToken(token) {
-			c.String(400, "Wrong token\n")
-			return
-		}
-
 		var uploadedFile multipart.File
 
-		if file, _, err := c.Request.FormFile("artifact"); err != nil {
-			c.String(500, "Error reading the uploaded file\n")
-			fmt.Println(err)
-			return
-		} else {
+		p := Promise{}
+		p.Then(func () error {
+			return GetProjectByName(req.PostForm("project"), project)
+		})
+		p.Then(func() error {
+			if !project.CheckToken(req.PostForm("token")) {
+				return errors.New("Wrong token")
+			}
+			return nil
+		})
+		p.Then(func() error {
+			file, _, err := req.Request.FormFile("artifact")
+			if err != nil {
+				return errors.New("Error while reading the uploaded file")
+			}
 			uploadedFile = file
-		}
+			return nil
+		})
+		p.Then(func() error {
+			return project.StoreArtifact(uploadedFile)
+		})
+		p.Then(func() error {
+			return project.RunDeploymentScript()
+		})
+		p.Then(func() error {
+			return project.RestartService()
+		})
+		p.Then(func() error {
+			req.String(200, "Done\n")
+			return nil
+		})
+		p.Catch(func(err error) {
+			req.String(400, err.Error() + "\n")
+		})
+		p.Run()
 
-		if err := project.StoreArtifact(uploadedFile); err != nil {
-			c.String(500, "Error storing the artifact\n")
-			fmt.Println(err)
-			return
-		}
-
-		if err := project.RunDeploymentScript(); err != nil {
-			c.String(500, "Error running project deploy script\n")
-			fmt.Println(err)
-			return
-		}
-
-		if err := project.RestartService(); err != nil {
-			c.String(500, "Error restarting service\n")
-			fmt.Println(err)
-			return
-		}
-
-		c.String(200, "Done\n")
 	})
 
 	router.Run(":8080")
 
 	return nil
 }
-
