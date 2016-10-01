@@ -8,7 +8,6 @@ import (
 	"os"
 	"io"
 	"github.com/urfave/cli"
-	"os/user"
 	"math/rand"
 	"golang.org/x/crypto/bcrypt"
 	"errors"
@@ -18,6 +17,7 @@ const Workspace = "/srv/molly"
 
 type Project struct {
 	Name string
+	Service Service
 	Config ProjectConfig
 }
 
@@ -145,31 +145,12 @@ func (p *Project) LoadConfig() error {
 }
 
 func (p *Project) CreateService() error {
-	currentUser, _ := user.Current()
-
-	return ioutil.WriteFile("/etc/systemd/system/molly-" + p.Name + ".service", []byte(`[Service]
-WorkingDirectory=` + (Workspace + "/" + p.Name + "/files") + `
-ExecStart=/bin/sh ` + (Workspace + "/" + p.Name + "/run.sh") + `
-Restart=always
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=` + ("molly-" + p.Name) + `
-User=` + (currentUser.Username) + `
-Group=` + (currentUser.Username) + `
-LimitNOFILE=64000
-
-[Install]
-WantedBy=multi-user.target
-`), 0644)
+	p.Service = Service{Name:p.Config.Service}
+	return p.Service.Save()
 }
 
 func (p *Project) RestartService() error {
-	cmd := exec.Command("/usr/sbin/service", p.Config.Service, "restart")
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New("There was an error while trying to restart the service: " + err.Error() + "\n" + string(out))
-	}
-	return nil
+	return p.Service.Restart()
 }
 
 func GenerateRandomPassword() string {
@@ -236,5 +217,13 @@ func AddProjectAction(c *cli.Context) error {
 
 	fmt.Println("Automatically generated token:", randomPassword)
 
+	return nil
+}
+
+func StartProjectServiceAction(c *cli.Context) error {
+	projectName := c.Args().First()
+	project := Project{}
+	GetProjectByName(projectName, &project)
+	project.RestartService()
 	return nil
 }

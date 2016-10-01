@@ -6,3 +6,5 @@ import:
 - package: golang.org/x/crypto
   subpackages:
   - bcrypt
+- package: github.com/go-ini/ini
+  version: ~1.21.1

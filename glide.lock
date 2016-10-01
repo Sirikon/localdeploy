@@ -1,11 +1,13 @@
-hash: 0d62f29e09d666aae5e4670ff53b5d0223cba8e55982f6f2ed6f868c67ae8de6
-updated: 2016-09-29T01:20:56.587725049+02:00
+hash: 11a30918e1e8e819e0b70814a92d4219c92ba66894978c33dc12e52b7c40e7f9
+updated: 2016-10-01T12:49:20.038186235+02:00
 imports:
 - name: github.com/gin-gonic/gin
   version: f931d1ea80ae95a6fc739213cdd9399bd2967fb6
   subpackages:
   - binding
   - render
+- name: github.com/go-ini/ini
+  version: 6e4869b434bd001f6983749881c7ead3545887d8
 - name: github.com/golang/protobuf
   version: 2402d76f3d41f928c7902a765dfc872356dd3aad
   subpackages:

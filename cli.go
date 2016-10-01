@@ -40,6 +40,17 @@ func InitCLI() {
 					Usage: "adds a new project",
 					Action: AddProjectAction,
 				},
+				{
+					Name: "service",
+					Usage: "Project service management",
+					Subcommands: []cli.Command{
+						{
+							Name: "start",
+							Usage: "starts the service",
+							Action: StartProjectServiceAction,
+						},
+					},
+				},
 			},
 		},
 	}
