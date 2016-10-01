@@ -17,7 +17,6 @@ const Workspace = "/srv/molly"
 
 type Project struct {
 	Name string
-	Service Service
 	Config ProjectConfig
 }
 
@@ -144,13 +143,16 @@ func (p *Project) LoadConfig() error {
 	return nil
 }
 
+func (p *Project) GetService() Service {
+	return Service{Name:p.Config.Service}
+}
+
 func (p *Project) CreateService() error {
-	p.Service = Service{Name:p.Config.Service}
-	return p.Service.Save()
+	return p.GetService().Save()
 }
 
 func (p *Project) RestartService() error {
-	return p.Service.Restart()
+	return p.GetService().Restart()
 }
 
 func GenerateRandomPassword() string {
