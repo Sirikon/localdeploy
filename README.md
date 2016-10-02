@@ -32,8 +32,6 @@ should run the command `molly daemon`.
 
 ### Creating a new project ###
 
-Run:
-
 ```
 molly project add [project name]
 ```
