@@ -24,10 +24,6 @@ a path inside your `$PATH` environment variable.
 Whatever option you choose, once done, you should be able to run `molly`
 command on your terminal.
 
-__Note__: Right now molly doesn't self-install as a service, you need
-to do this by yourself to be sure it's always working. This service
-should run the command `molly daemon`.
-
 ## Usage ##
 
 ### Creating a new project ###
@@ -78,6 +74,9 @@ molly daemon
 ```
 
 This will start a web server on port 8080 ready to receive the deployment requests.
+
+__Note__: Right now molly doesn't self-install as a service, you need
+to do this by yourself to be sure it's always working.
 
 ### Deploying a project ###
 
