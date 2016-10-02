@@ -184,6 +184,11 @@ func (p *Project) CheckToken(password string) bool {
 func AddProjectAction(c *cli.Context) error {
 	projectName := c.Args().First()
 
+	if projectName == "" {
+		fmt.Println("Missing project name\n\nUsage:\nmolly project add [project name]")
+		return nil
+	}
+
 	randomPassword := GenerateRandomPassword()
 	hashedPassword, err := HashPassword(randomPassword)
 
