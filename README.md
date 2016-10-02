@@ -80,6 +80,9 @@ to do this by yourself to be sure it's always working.
 
 ### Deploying a project ###
 
+Once the project is properly configured and the molly daemon is running, you are able to deploy
+your project.
+
 ```bash
 zip -r artifact * # Compress whatever you need to deploy into artifact.zip
 curl -F artifact=@./artifact.zip -F project=[project name] -F token=[project token] "http://yourserver.com:8080/deploy"
