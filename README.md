@@ -8,12 +8,12 @@
 
 ### Automatic ###
 
-```
+```bash
 curl https://molly.sirikon.me/install.sh | bash
 ```
 ### Manual ###
 
-```
+```bash
 wget https://dl.sirikon.me/molly.zip
 ```
 
@@ -32,7 +32,7 @@ should run the command `molly daemon`.
 
 ### Creating a new project ###
 
-```
+```bash
 molly project add [project name]
 ```
 
@@ -47,23 +47,43 @@ This will create the folder structures inside `/srv/molly/[project name]`.
 
 Here you
 can find the `run.sh` and `deploy.sh` files, which are used to define how
-to run and deploy your project. (both files are executed with
-`/srv/molly/[project name]/files` as CWD)
+to run and deploy your project.
 
 ### Configuring a project ###
 
+When molly receives a new artifact will first __deploy__ and then __run__
+the project (both files are executed with `/srv/molly/[project name]/files`
+as CWD)
+
 For example, for a Node.js project, the `deploy.sh` file would look like this:
 
-```
+```bash
 unzip $MOLLY_ARTIFACT
 /path/to/npm install
 ```
 
 And the `run.sh` file should look like this:
 
-```
+```bash
 EXAMPLE_ENV_VAR=example_value
 /path/to/node index.js
+```
+
+### Running molly daemon ###
+
+To run the molly daemon just run the following command:
+
+```bash
+molly daemon
+```
+
+This will start a web server on port 8080 ready to receive the deployment requests.
+
+### Deploying a project ###
+
+```bash
+zip -r artifact * # Compress whatever you need to deploy into artifact.zip
+curl -F artifact=@./artifact.zip -F project=[project name] -F token=[project token] "http://yourserver.com:8080/deploy"
 ```
 
 ## License ##
