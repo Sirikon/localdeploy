@@ -40,9 +40,9 @@ This will create the folder structures inside `/srv/molly/[project name]`.
 
 ```
 /srv/molly/[project name]
- |- run.sh
- |- deploy.sh
- |- files/
+ ├─ run.sh
+ ├─ deploy.sh
+ └─ files/
 ```
 
 Here you
