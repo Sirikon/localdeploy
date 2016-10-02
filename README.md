@@ -36,19 +36,30 @@ should run the command `molly daemon`.
 molly project add [project name]
 ```
 
-This will create the folder structures inside `/srv/molly/[project name]`, here you
+This will create the folder structures inside `/srv/molly/[project name]`.
+
+```
+/srv/molly/[project name]
+ |- run.sh
+ |- deploy.sh
+ |- files/
+```
+
+Here you
 can find the `run.sh` and `deploy.sh` files, which are used to define how
 to run and deploy your project. (both files are executed with
 `/srv/molly/[project name]/files` as CWD)
 
-For example, for a Node.js project, the deploy.sh file would look like this:
+### Configuring a project ###
+
+For example, for a Node.js project, the `deploy.sh` file would look like this:
 
 ```
 unzip $MOLLY_ARTIFACT
 /path/to/npm install
 ```
 
-And the run.sh file should look like this:
+And the `run.sh` file should look like this:
 
 ```
 EXAMPLE_ENV_VAR=example_value
