@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"errors"
-	"fmt"
 )
 
 type SystemdServiceStrategy struct {
@@ -14,13 +13,13 @@ type SystemdServiceStrategy struct {
 
 func (p SystemdServiceStrategy) Save(service Service) error {
 	currentUser, _ := user.Current()
-	return ioutil.WriteFile("/etc/systemd/system/" + service.Name + ".service", []byte(`[Service]
-WorkingDirectory=` + (Workspace + "/" + service.Name + "/files") + `
-ExecStart=/bin/sh ` + (Workspace + "/" + service.Name + "/run.sh") + `
+	return ioutil.WriteFile("/etc/systemd/system/" + service.Project.Config.Service + ".service", []byte(`[Service]
+WorkingDirectory=` + (Workspace + "/" + service.Project.Config.Name + "/files") + `
+ExecStart=/bin/sh ` + (Workspace + "/" + service.Project.Config.Name + "/run.sh") + `
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=` + ("molly-" + service.Name) + `
+SyslogIdentifier=` + (service.Project.Config.Service) + `
 User=` + (currentUser.Username) + `
 Group=` + (currentUser.Username) + `
 LimitNOFILE=64000
@@ -31,30 +30,28 @@ WantedBy=multi-user.target
 }
 
 func (p SystemdServiceStrategy) Start(service Service) error {
-	commandToExecute := "Command to execute: /usr/sbin/service " + service.Name + " start"
-	fmt.Println("Command to execute: /usr/sbin/service " + service.Name + " start")
-	cmd := exec.Command("/usr/sbin/service", service.Name, "start")
+	commandToExecute := "Command to execute: /usr/sbin/service " + service.Project.Config.Service + " start"
+	cmd := exec.Command("/usr/sbin/service", service.Project.Config.Service, "start")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return errors.New("There was an error while trying to restart the service: " + err.Error() + "\n" + string(out) + "\n\nUsed command:\n" + commandToExecute)
+		return errors.New("There was an error while trying to start the service: " + err.Error() + "\n" + string(out) + "\n\nUsed command:\n" + commandToExecute)
 	}
 	return nil
 }
 
 func (p SystemdServiceStrategy) Stop(service Service) error {
-	commandToExecute := "Command to execute: /usr/sbin/service " + service.Name + " stop"
-	fmt.Println("Command to execute: /usr/sbin/service " + service.Name + " stop")
-	cmd := exec.Command("/usr/sbin/service", service.Name, "stop")
+	commandToExecute := "Command to execute: /usr/sbin/service " + service.Project.Config.Service + " stop"
+	cmd := exec.Command("/usr/sbin/service", service.Project.Config.Service, "stop")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return errors.New("There was an error while trying to restart the service: " + err.Error() + "\n" + string(out) + "\n\nUsed command:\n" + commandToExecute)
+		return errors.New("There was an error while trying to stop the service: " + err.Error() + "\n" + string(out) + "\n\nUsed command:\n" + commandToExecute)
 	}
 	return nil
 }
 
 func (p SystemdServiceStrategy) Restart(service Service) error {
-	commandToExecute := "Command to execute: /usr/sbin/service " + service.Name + " restart"
-	cmd := exec.Command("/usr/sbin/service", service.Name, "restart")
+	commandToExecute := "Command to execute: /usr/sbin/service " + service.Project.Config.Service + " restart"
+	cmd := exec.Command("/usr/sbin/service", service.Project.Config.Service, "restart")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New("There was an error while trying to restart the service: " + err.Error() + "\n" + string(out) + "\n\nUsed command:\n" + commandToExecute)

@@ -1,7 +1,7 @@
 package main
 
 type Service struct {
-	Name string
+	Project Project
 }
 
 func (s Service) Save() error {

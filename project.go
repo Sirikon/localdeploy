@@ -143,8 +143,8 @@ func (p *Project) LoadConfig() error {
 	return nil
 }
 
-func (p *Project) GetService() Service {
-	return Service{Name:p.Config.Service}
+func (p Project) GetService() Service {
+	return Service{Project:p}
 }
 
 func (p *Project) CreateService() error {
