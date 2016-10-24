@@ -229,6 +229,12 @@ func AddProjectAction(c *cli.Context) error {
 
 func StartProjectServiceAction(c *cli.Context) error {
 	projectName := c.Args().First()
+
+	if projectName == "" {
+		fmt.Println("Missing project name\n\nUsage:\nmolly project service start [project name]")
+		return nil
+	}
+
 	project := Project{}
 	GetProjectByName(projectName, &project)
 	project.RestartService()
