@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/urfave/cli"
-	"os"
 	"fmt"
+	"os"
+
+	"github.com/urfave/cli"
 )
 
+// InitCLI initializes the CLI options
 func InitCLI() {
 
 	cli.AppHelpTemplate = fmt.Sprintf(`
@@ -27,26 +29,26 @@ func InitCLI() {
 
 	app.Commands = []cli.Command{
 		{
-			Name: "daemon",
-			Usage: "Starts the application as a daemon",
-			Action: ActionDaemon,
+			Name:   "daemon",
+			Usage:  "Starts the application as a daemon",
+			Action: DaemonAction,
 		},
 		{
-			Name: "project",
+			Name:  "project",
 			Usage: "Project management",
 			Subcommands: []cli.Command{
 				{
-					Name: "add",
-					Usage: "adds a new project",
+					Name:   "add",
+					Usage:  "adds a new project",
 					Action: AddProjectAction,
 				},
 				{
-					Name: "service",
+					Name:  "service",
 					Usage: "Project service management",
 					Subcommands: []cli.Command{
 						{
-							Name: "start",
-							Usage: "starts the service",
+							Name:   "start",
+							Usage:  "starts the service",
 							Action: StartProjectServiceAction,
 						},
 					},

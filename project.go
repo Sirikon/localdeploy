@@ -1,28 +1,31 @@
 package main
 
 import (
-	"io/ioutil"
-	"gopkg.in/yaml.v2"
-	"os/exec"
-	"fmt"
-	"os"
-	"io"
-	"github.com/urfave/cli"
-	"math/rand"
-	"golang.org/x/crypto/bcrypt"
 	"errors"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"math/rand"
+	"os"
+	"os/exec"
+
+	"github.com/urfave/cli"
+	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/yaml.v2"
 )
 
+// Workspace stablishes the folder where all molly projects
+// will be stored
 const Workspace = "/srv/molly"
 
 type Project struct {
-	Name string
+	Name   string
 	Config ProjectConfig
 }
 
 type ProjectConfig struct {
-	Name string
-	Token string
+	Name    string
+	Token   string
 	Service string
 }
 
@@ -65,7 +68,7 @@ func (p *Project) RunDeploymentScript() error {
 		return errors.New("Couldn't clean the files folder: " + err.Error())
 	}
 
-	cmd := exec.Command("sh", Workspace + "/" + p.Name + "/deploy.sh")
+	cmd := exec.Command("sh", Workspace+"/"+p.Name+"/deploy.sh")
 	cmd.Dir = Workspace + "/" + p.Name + "/files/"
 	cmd.Env = p.GetEnvVars()
 
@@ -78,18 +81,18 @@ func (p *Project) RunDeploymentScript() error {
 }
 
 func (p *Project) CreateDeploymentScript() error {
-	return ioutil.WriteFile(Workspace + "/" + p.Name + "/deploy.sh", []byte("unzip $MOLLY_ARTIFACT\n"), 0700)
+	return ioutil.WriteFile(Workspace+"/"+p.Name+"/deploy.sh", []byte("unzip $MOLLY_ARTIFACT\n"), 0700)
 }
 
 func (p *Project) CreateRunScript() error {
-	return ioutil.WriteFile(Workspace + "/" + p.Name + "/run.sh", []byte("# Write here the run command\n"), 0700)
+	return ioutil.WriteFile(Workspace+"/"+p.Name+"/run.sh", []byte("# Write here the run command\n"), 0700)
 }
 
 func (p *Project) StoreArtifact(fileReader io.Reader) error {
 	var artifactFile *os.File
 
 	if out, err := os.Create(Workspace + "/" + p.Name + "/artifact.zip"); err != nil {
-		return errors.New("Couldn't create the artifact file: "  + err.Error())
+		return errors.New("Couldn't create the artifact file: " + err.Error())
 	} else {
 		artifactFile = out
 	}
@@ -97,7 +100,7 @@ func (p *Project) StoreArtifact(fileReader io.Reader) error {
 	defer artifactFile.Close()
 
 	if _, err := io.Copy(artifactFile, fileReader); err != nil {
-		return errors.New("Couldn't copy the artifact file to destiny: "  + err.Error())
+		return errors.New("Couldn't copy the artifact file to destiny: " + err.Error())
 	}
 
 	return nil
@@ -126,10 +129,10 @@ func (p *Project) LoadConfig() error {
 
 	var projectFileBytes []byte
 
-	if bytes, err := ioutil.ReadFile(projectFilePath); err != nil {
-		return err
-	} else {
+	if bytes, err := ioutil.ReadFile(projectFilePath); err == nil {
 		projectFileBytes = bytes
+	} else {
+		return err
 	}
 
 	config := ProjectConfig{}
@@ -144,7 +147,7 @@ func (p *Project) LoadConfig() error {
 }
 
 func (p Project) GetService() Service {
-	return Service{Project:p}
+	return Service{Project: p}
 }
 
 func (p *Project) CreateService() error {
@@ -199,8 +202,8 @@ func AddProjectAction(c *cli.Context) error {
 	project := Project{
 		Name: projectName,
 		Config: ProjectConfig{
-			Name: projectName,
-			Token: hashedPassword,
+			Name:    projectName,
+			Token:   hashedPassword,
 			Service: "molly-" + projectName,
 		},
 	}

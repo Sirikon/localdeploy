@@ -1,13 +1,16 @@
 package main
 
 import (
-	"mime/multipart"
-	"github.com/urfave/cli"
-	"github.com/gin-gonic/gin"
 	"errors"
+	"mime/multipart"
+
+	"github.com/gin-gonic/gin"
+	"github.com/urfave/cli"
 )
 
-func ActionDaemon(c *cli.Context) error {
+// DaemonAction defines a CLI action which initializes the daemon
+// which listens HTTP requests
+func DaemonAction(c *cli.Context) error {
 	router := gin.Default()
 
 	router.POST("/deploy", func(req *gin.Context) {
@@ -16,7 +19,7 @@ func ActionDaemon(c *cli.Context) error {
 		var uploadedFile multipart.File
 
 		p := Promise{}
-		p.Then(func () error {
+		p.Then(func() error {
 			return GetProjectByName(req.PostForm("project"), project)
 		})
 		p.Then(func() error {
@@ -47,7 +50,7 @@ func ActionDaemon(c *cli.Context) error {
 			return nil
 		})
 		p.Catch(func(err error) {
-			req.String(400, err.Error() + "\n")
+			req.String(400, err.Error()+"\n")
 		})
 		p.Run()
 
