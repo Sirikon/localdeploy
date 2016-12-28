@@ -1,6 +1,7 @@
 # Molly #
 
-[![CircleCI](https://circleci.com/gh/Sirikon/molly.svg?style=svg)](https://circleci.com/gh/Sirikon/molly)
+[![CircleCI](https://circleci.com/gh/Sirikon/molly.svg?style=shield)](https://circleci.com/gh/Sirikon/molly)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sirikon/molly)](https://goreportcard.com/report/github.com/sirikon/molly)
 
 ![Molly Malone](http://i.imgur.com/vpbfqlb.jpg)
 
