@@ -15,15 +15,15 @@ func DaemonAction(c *cli.Context) error {
 
 	router.POST("/deploy", func(req *gin.Context) {
 
-		project := &Project{}
+		project := Project{}
 		var uploadedFile multipart.File
 
 		p := Promise{}
 		p.Then(func() error {
-			return GetProjectByName(req.PostForm("project"), project)
+			return GetProjectByName(req.PostForm("project"), &project)
 		})
 		p.Then(func() error {
-			if !project.CheckToken(req.PostForm("token")) {
+			if !CheckProjectToken(project, req.PostForm("token")) {
 				return errors.New("Wrong token")
 			}
 			return nil
@@ -37,13 +37,13 @@ func DaemonAction(c *cli.Context) error {
 			return nil
 		})
 		p.Then(func() error {
-			return project.StoreArtifact(uploadedFile)
+			return StoreProjectArtifact(project, uploadedFile)
 		})
 		p.Then(func() error {
-			return project.RunDeploymentScript()
+			return RunProjectDeploymentScript(project)
 		})
 		p.Then(func() error {
-			return project.RestartService()
+			return RestartProjectService(project)
 		})
 		p.Then(func() error {
 			req.String(200, "Done\n")

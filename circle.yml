@@ -1,8 +1,8 @@
 general:
   artifacts:
     - "molly" # Executable
-deployment:
-  master:
-    branch: master
-    commands:
-      - ./deploy.sh
+# deployment:
+#   master:
+#     branch: master
+#     commands:
+#       - ./deploy.sh
