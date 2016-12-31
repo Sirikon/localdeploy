@@ -2,18 +2,14 @@ package main
 
 import (
 	"math/rand"
-	"runtime"
 	"time"
 )
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	var config = Config{
-		OS:        runtime.GOOS,
-		PathSep:   "/",
-		Workspace: "/srv/molly",
-	}
+	var config = Config{}
+	config.Init()
 
 	var projectPaths = ProjectPaths{config}
 	var projectLogic = ProjectLogic{config, projectPaths}
