@@ -6,7 +6,12 @@ import (
 	"github.com/urfave/cli"
 )
 
-func validateAddProjectContext(c *cli.Context) bool {
+// ProjectActions .
+type ProjectActions struct {
+	ProjectLogic ProjectLogic
+}
+
+func (pa ProjectActions) validateAddContext(c *cli.Context) bool {
 	projectName := c.Args().First()
 	if projectName == "" {
 		fmt.Println("Missing project name\n\nUsage:\nmolly project add [project name]")
@@ -15,16 +20,16 @@ func validateAddProjectContext(c *cli.Context) bool {
 	return true
 }
 
-// AddProjectAction will create a new project in system
-func AddProjectAction(c *cli.Context) error {
-	if !validateAddProjectContext(c) {
+// AddAction will create a new project in system
+func (pa ProjectActions) AddAction(c *cli.Context) error {
+	if !pa.validateAddContext(c) {
 		return nil
 	}
 
 	projectName := c.Args().First()
 
-	randomToken := GenerateRandomToken()
-	hashedToken, err := HashToken(randomToken)
+	randomToken := pa.ProjectLogic.GenerateRandomToken()
+	hashedToken, err := pa.ProjectLogic.HashToken(randomToken)
 
 	if err != nil {
 		return err
@@ -35,21 +40,21 @@ func AddProjectAction(c *cli.Context) error {
 		Token:   hashedToken,
 		Service: "molly-" + projectName,
 	}
-	if err := CreateProjectFilesFolder(project); err != nil {
+	if err := pa.ProjectLogic.CreateFilesFolder(project); err != nil {
 		return err
 	}
-	if err := CreateProjectDeploymentScript(project); err != nil {
+	if err := pa.ProjectLogic.CreateDeploymentScript(project); err != nil {
 		return err
 	}
-	if err := CreateProjectRunScript(project); err != nil {
+	if err := pa.ProjectLogic.CreateRunScript(project); err != nil {
 		return err
 	}
-	if err := CreateProjectService(project); err != nil {
+	if err := pa.ProjectLogic.CreateService(project); err != nil {
 		fmt.Println("Error while creating the service")
 		fmt.Println(err)
 		return err
 	}
-	if err := WriteProjectFile(project); err != nil {
+	if err := pa.ProjectLogic.Save(project); err != nil {
 		return err
 	}
 
@@ -58,7 +63,7 @@ func AddProjectAction(c *cli.Context) error {
 	return nil
 }
 
-func validateStartProjectServiceContext(c *cli.Context) bool {
+func (pa ProjectActions) validateStartServiceContext(c *cli.Context) bool {
 	projectName := c.Args().First()
 	if projectName == "" {
 		fmt.Println("Missing project name\n\nUsage:\nmolly project service start [project name]")
@@ -67,16 +72,16 @@ func validateStartProjectServiceContext(c *cli.Context) bool {
 	return true
 }
 
-// StartProjectServiceAction starts the project's service
-func StartProjectServiceAction(c *cli.Context) error {
-	if !validateStartProjectServiceContext(c) {
+// StartServiceAction starts the project's service
+func (pa ProjectActions) StartServiceAction(c *cli.Context) error {
+	if !pa.validateStartServiceContext(c) {
 		return nil
 	}
 
 	projectName := c.Args().First()
 
 	project := Project{}
-	GetProjectByName(projectName, &project)
-	RestartProjectService(project)
+	pa.ProjectLogic.GetByName(projectName, &project)
+	pa.ProjectLogic.RestartService(project)
 	return nil
 }

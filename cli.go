@@ -7,8 +7,14 @@ import (
 	"github.com/urfave/cli"
 )
 
-// InitCLI initializes the CLI options
-func InitCLI() {
+// CLI .
+type CLI struct {
+	DaemonAction   DaemonAction
+	ProjectActions ProjectActions
+}
+
+// Init initializes the CLI options
+func (c CLI) Init() {
 
 	cli.AppHelpTemplate = fmt.Sprintf(`
 	   __     __)
@@ -31,7 +37,7 @@ func InitCLI() {
 		{
 			Name:   "daemon",
 			Usage:  "Starts the application as a daemon",
-			Action: DaemonAction,
+			Action: c.DaemonAction.Run,
 		},
 		{
 			Name:  "project",
@@ -40,7 +46,7 @@ func InitCLI() {
 				{
 					Name:   "add",
 					Usage:  "adds a new project",
-					Action: AddProjectAction,
+					Action: c.ProjectActions.AddAction,
 				},
 				{
 					Name:  "service",
@@ -49,7 +55,7 @@ func InitCLI() {
 						{
 							Name:   "start",
 							Usage:  "starts the service",
-							Action: StartProjectServiceAction,
+							Action: c.ProjectActions.StartServiceAction,
 						},
 					},
 				},

@@ -8,9 +8,17 @@ import (
 	"github.com/urfave/cli"
 )
 
-// DaemonAction defines a CLI action which initializes the daemon
+// DaemonAction .
+type DaemonAction struct {
+	ProjectLogic ProjectLogic
+}
+
+// Run defines a CLI action which initializes the daemon
 // which listens HTTP requests
-func DaemonAction(c *cli.Context) error {
+func (da DaemonAction) Run(c *cli.Context) error {
+
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.Default()
 
 	router.POST("/deploy", func(req *gin.Context) {
@@ -20,10 +28,12 @@ func DaemonAction(c *cli.Context) error {
 
 		p := Promise{}
 		p.Then(func() error {
-			return GetProjectByName(req.PostForm("project"), &project)
+			return da.ProjectLogic.GetByName(req.PostForm("project"), &project)
 		})
 		p.Then(func() error {
-			if !CheckProjectToken(project, req.PostForm("token")) {
+			var receivedToken = req.PostForm("token")
+			var tokenIsCorrect = da.ProjectLogic.CheckToken(project, receivedToken)
+			if !tokenIsCorrect {
 				return errors.New("Wrong token")
 			}
 			return nil
@@ -37,13 +47,13 @@ func DaemonAction(c *cli.Context) error {
 			return nil
 		})
 		p.Then(func() error {
-			return StoreProjectArtifact(project, uploadedFile)
+			return da.ProjectLogic.StoreArtifact(project, uploadedFile)
 		})
 		p.Then(func() error {
-			return RunProjectDeploymentScript(project)
+			return da.ProjectLogic.RunDeploymentScript(project)
 		})
 		p.Then(func() error {
-			return RestartProjectService(project)
+			return da.ProjectLogic.RestartService(project)
 		})
 		p.Then(func() error {
 			req.String(200, "Done\n")

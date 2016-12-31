@@ -10,14 +10,15 @@ import (
 // SystemdServiceStrategy stablishes the logic needed to run Systemd
 // services with molly
 type SystemdServiceStrategy struct {
+	ProjectPaths ProjectPaths
 }
 
 // Save the new service
 func (p SystemdServiceStrategy) Save(service Service) error {
 	currentUser, _ := user.Current()
 	return ioutil.WriteFile("/etc/systemd/system/"+service.Project.Service+".service", []byte(`[Service]
-WorkingDirectory=`+(service.Project.GetFilesFolderPath())+`
-ExecStart=/bin/sh `+(service.Project.GetRunScriptPath())+`
+WorkingDirectory=`+(p.ProjectPaths.GetFilesFolderPath(service.Project))+`
+ExecStart=/bin/sh `+(p.ProjectPaths.GetRunScriptPath(service.Project))+`
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
