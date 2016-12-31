@@ -1,5 +1,15 @@
 package main
 
+// IProjectPaths .
+type IProjectPaths interface {
+	GetHomePath(Project) string
+	GetFilePath(Project) string
+	GetFilesFolderPath(Project) string
+	GetDeploymentScriptPath(Project) string
+	GetRunScriptPath(Project) string
+	GetArtifactPath(Project) string
+}
+
 // ProjectPaths path builder for projects
 type ProjectPaths struct {
 	Config Config

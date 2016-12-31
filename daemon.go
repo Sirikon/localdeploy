@@ -8,9 +8,14 @@ import (
 	"github.com/urfave/cli"
 )
 
+// IDaemonAction .
+type IDaemonAction interface {
+	Run(*cli.Context) error
+}
+
 // DaemonAction .
 type DaemonAction struct {
-	ProjectLogic ProjectLogic
+	projectLogic IProjectLogic
 }
 
 // Run defines a CLI action which initializes the daemon
@@ -28,11 +33,11 @@ func (da DaemonAction) Run(c *cli.Context) error {
 
 		p := Promise{}
 		p.Then(func() error {
-			return da.ProjectLogic.GetByName(req.PostForm("project"), &project)
+			return da.projectLogic.GetByName(req.PostForm("project"), &project)
 		})
 		p.Then(func() error {
 			var receivedToken = req.PostForm("token")
-			var tokenIsCorrect = da.ProjectLogic.CheckToken(project, receivedToken)
+			var tokenIsCorrect = da.projectLogic.CheckToken(project, receivedToken)
 			if !tokenIsCorrect {
 				return errors.New("Wrong token")
 			}
@@ -47,13 +52,13 @@ func (da DaemonAction) Run(c *cli.Context) error {
 			return nil
 		})
 		p.Then(func() error {
-			return da.ProjectLogic.StoreArtifact(project, uploadedFile)
+			return da.projectLogic.StoreArtifact(project, uploadedFile)
 		})
 		p.Then(func() error {
-			return da.ProjectLogic.RunDeploymentScript(project)
+			return da.projectLogic.RunDeploymentScript(project)
 		})
 		p.Then(func() error {
-			return da.ProjectLogic.RestartService(project)
+			return da.projectLogic.RestartService(project)
 		})
 		p.Then(func() error {
 			req.String(200, "Done\n")

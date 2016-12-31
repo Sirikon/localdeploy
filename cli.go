@@ -9,8 +9,8 @@ import (
 
 // CLI .
 type CLI struct {
-	DaemonAction   DaemonAction
-	ProjectActions ProjectActions
+	daemonAction   IDaemonAction
+	projectActions IProjectActions
 }
 
 // Init initializes the CLI options
@@ -37,7 +37,7 @@ func (c CLI) Init() {
 		{
 			Name:   "daemon",
 			Usage:  "Starts the application as a daemon",
-			Action: c.DaemonAction.Run,
+			Action: c.daemonAction.Run,
 		},
 		{
 			Name:  "project",
@@ -46,7 +46,7 @@ func (c CLI) Init() {
 				{
 					Name:   "add",
 					Usage:  "adds a new project",
-					Action: c.ProjectActions.AddAction,
+					Action: c.projectActions.AddAction,
 				},
 				{
 					Name:  "service",
@@ -55,7 +55,7 @@ func (c CLI) Init() {
 						{
 							Name:   "start",
 							Usage:  "starts the service",
-							Action: c.ProjectActions.StartServiceAction,
+							Action: c.projectActions.StartServiceAction,
 						},
 					},
 				},

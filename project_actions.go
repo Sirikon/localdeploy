@@ -6,9 +6,15 @@ import (
 	"github.com/urfave/cli"
 )
 
+// IProjectActions .
+type IProjectActions interface {
+	AddAction(*cli.Context) error
+	StartServiceAction(*cli.Context) error
+}
+
 // ProjectActions .
 type ProjectActions struct {
-	ProjectLogic ProjectLogic
+	projectLogic IProjectLogic
 }
 
 func (pa ProjectActions) validateAddContext(c *cli.Context) bool {
@@ -28,8 +34,8 @@ func (pa ProjectActions) AddAction(c *cli.Context) error {
 
 	projectName := c.Args().First()
 
-	randomToken := pa.ProjectLogic.GenerateRandomToken()
-	hashedToken, err := pa.ProjectLogic.HashToken(randomToken)
+	randomToken := pa.projectLogic.GenerateRandomToken()
+	hashedToken, err := pa.projectLogic.HashToken(randomToken)
 
 	if err != nil {
 		return err
@@ -40,21 +46,21 @@ func (pa ProjectActions) AddAction(c *cli.Context) error {
 		Token:   hashedToken,
 		Service: "molly-" + projectName,
 	}
-	if err := pa.ProjectLogic.CreateFilesFolder(project); err != nil {
+	if err := pa.projectLogic.CreateFilesFolder(project); err != nil {
 		return err
 	}
-	if err := pa.ProjectLogic.CreateDeploymentScript(project); err != nil {
+	if err := pa.projectLogic.CreateDeploymentScript(project); err != nil {
 		return err
 	}
-	if err := pa.ProjectLogic.CreateRunScript(project); err != nil {
+	if err := pa.projectLogic.CreateRunScript(project); err != nil {
 		return err
 	}
-	if err := pa.ProjectLogic.CreateService(project); err != nil {
+	if err := pa.projectLogic.CreateService(project); err != nil {
 		fmt.Println("Error while creating the service")
 		fmt.Println(err)
 		return err
 	}
-	if err := pa.ProjectLogic.Save(project); err != nil {
+	if err := pa.projectLogic.Save(project); err != nil {
 		return err
 	}
 
@@ -81,7 +87,7 @@ func (pa ProjectActions) StartServiceAction(c *cli.Context) error {
 	projectName := c.Args().First()
 
 	project := Project{}
-	pa.ProjectLogic.GetByName(projectName, &project)
-	pa.ProjectLogic.RestartService(project)
+	pa.projectLogic.GetByName(projectName, &project)
+	pa.projectLogic.RestartService(project)
 	return nil
 }
