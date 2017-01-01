@@ -1,3 +1,9 @@
+dependencies:
+  override:
+    - go get -u github.com/jstemmer/go-junit-report
+test:
+  override:
+    - go test -v | go-junit-report > report.xml
 general:
   artifacts:
     - "molly" # Executable
