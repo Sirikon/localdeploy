@@ -38,7 +38,7 @@ type ProjectLogic struct {
 }
 
 // GetByName populates the given project with the existing one
-func (pl ProjectLogic) GetByName(projectName string, project *Project) error {
+func (pl *ProjectLogic) GetByName(projectName string, project *Project) error {
 
 	var projectFileBytes []byte
 
@@ -124,7 +124,7 @@ func (pl ProjectLogic) StoreArtifact(project Project, fileReader io.Reader) erro
 
 	defer artifactFile.Close()
 
-	if _, err := pl.fileSystem.Copy(artifactFile, fileReader); err != nil {
+	if _, err := io.Copy(artifactFile, fileReader); err != nil {
 		return errors.New("Couldn't copy the artifact file to destiny: " + err.Error())
 	}
 

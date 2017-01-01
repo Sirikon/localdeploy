@@ -8,8 +8,10 @@ import (
 
 // IProjectActions .
 type IProjectActions interface {
-	AddAction(*cli.Context) error
-	StartServiceAction(*cli.Context) error
+	AddCLIAction(*cli.Context) error
+	AddAction(string) error
+	StartServiceCLIAction(*cli.Context) error
+	StartServiceAction(string) error
 }
 
 // ProjectActions .
@@ -17,7 +19,7 @@ type ProjectActions struct {
 	projectLogic IProjectLogic
 }
 
-func (pa ProjectActions) validateAddContext(c *cli.Context) bool {
+func (pa *ProjectActions) validateAddContext(c *cli.Context) bool {
 	projectName := c.Args().First()
 	if projectName == "" {
 		fmt.Println("Missing project name\n\nUsage:\nmolly project add [project name]")
@@ -26,13 +28,16 @@ func (pa ProjectActions) validateAddContext(c *cli.Context) bool {
 	return true
 }
 
-// AddAction will create a new project in system
-func (pa ProjectActions) AddAction(c *cli.Context) error {
+// AddCLIAction .
+func (pa *ProjectActions) AddCLIAction(c *cli.Context) error {
 	if !pa.validateAddContext(c) {
 		return nil
 	}
+	return pa.StartServiceAction(c.Args().First())
+}
 
-	projectName := c.Args().First()
+// AddAction will create a new project in system
+func (pa *ProjectActions) AddAction(projectName string) error {
 
 	randomToken := pa.projectLogic.GenerateRandomToken()
 	hashedToken, err := pa.projectLogic.HashToken(randomToken)
@@ -69,7 +74,7 @@ func (pa ProjectActions) AddAction(c *cli.Context) error {
 	return nil
 }
 
-func (pa ProjectActions) validateStartServiceContext(c *cli.Context) bool {
+func (pa *ProjectActions) validateStartServiceContext(c *cli.Context) bool {
 	projectName := c.Args().First()
 	if projectName == "" {
 		fmt.Println("Missing project name\n\nUsage:\nmolly project service start [project name]")
@@ -78,16 +83,25 @@ func (pa ProjectActions) validateStartServiceContext(c *cli.Context) bool {
 	return true
 }
 
-// StartServiceAction starts the project's service
-func (pa ProjectActions) StartServiceAction(c *cli.Context) error {
+// StartServiceCLIAction .
+func (pa *ProjectActions) StartServiceCLIAction(c *cli.Context) error {
 	if !pa.validateStartServiceContext(c) {
 		return nil
 	}
+	return pa.StartServiceAction(c.Args().First())
+}
 
-	projectName := c.Args().First()
-
+// StartServiceAction starts the project's service
+func (pa *ProjectActions) StartServiceAction(projectName string) error {
 	project := Project{}
-	pa.projectLogic.GetByName(projectName, &project)
-	pa.projectLogic.RestartService(project)
+
+	if err := pa.projectLogic.GetByName(projectName, &project); err != nil {
+		return err
+	}
+
+	if err := pa.projectLogic.RestartService(project); err != nil {
+		return err
+	}
+
 	return nil
 }

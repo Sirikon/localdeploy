@@ -55,7 +55,7 @@ func (c CLI) Init() {
 						{
 							Name:   "start",
 							Usage:  "starts the service",
-							Action: c.projectActions.StartServiceAction,
+							Action: c.projectActions.StartServiceCLIAction,
 						},
 					},
 				},
