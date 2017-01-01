@@ -3,9 +3,8 @@ dependencies:
     - go get -u github.com/jstemmer/go-junit-report
 test:
   override:
-    - "go test -v | go-junit-report > report.xml":
-      files:
-        - report.xml
+    - mkdir $CIRCLE_TEST_REPORTS/junit
+    - go test -v | go-junit-report > $CIRCLE_TEST_REPORTS/junit/test-results.xml
 general:
   artifacts:
     - "molly" # Executable
