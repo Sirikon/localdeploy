@@ -1,6 +1,6 @@
 machine:
   environment:
-    IMPORT_PATH: "/home/ubuntu/.go_workspace/src/github.com/sirikon"
+    IMPORT_PATH: "/home/ubuntu/.go_workspace/src/github.com/Sirikon"
     APP_PATH: "$IMPORT_PATH/molly"
 dependencies:
   override:
