@@ -2,6 +2,7 @@ dependencies:
   override:
     - go get -t -d -v ./...
     - go build -v
+    - env GOOS=windows GOARCH=amd64 go build -v
 test:
   override:
     - go get -u github.com/jstemmer/go-junit-report
@@ -9,7 +10,8 @@ test:
     - go test -v | go-junit-report > $CIRCLE_TEST_REPORTS/junit/test-results.xml
 general:
   artifacts:
-    - "molly" # Executable
+    - "molly" # Linux executable
+    - "molly.exe" # Windows executable
 # deployment:
 #   master:
 #     branch: master
