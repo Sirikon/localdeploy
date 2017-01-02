@@ -3,6 +3,7 @@ dependencies:
     - sudo add-apt-repository ppa:masterminds/glide -y
     - sudo apt-get update
     - sudo apt-get install glide -y
+    - mkdir -p /home/ubuntu/.go_workspace/src
     - glide install
     - go build -v
     - env GOOS=windows GOARCH=amd64 go build -v
