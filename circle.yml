@@ -1,6 +1,9 @@
 dependencies:
   override:
-    - go get -t -d -v ./...
+    - sudo add-apt-repository ppa:masterminds/glide -y
+    - sudo apt-get update
+    - sudo apt-get install glide -y
+    - glide install
     - go build -v
     - env GOOS=windows GOARCH=amd64 go build -v
 test:
