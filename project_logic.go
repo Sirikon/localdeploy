@@ -15,6 +15,7 @@ import (
 // IProjectLogic .
 type IProjectLogic interface {
 	GetByName(string, *Project) error
+	Exists(string) bool
 	CreateFilesFolder(Project) error
 	CleanFilesFolder(Project) error
 	RunDeploymentScript(Project) error
@@ -53,6 +54,15 @@ func (pl *ProjectLogic) GetByName(projectName string, project *Project) error {
 	}
 
 	return nil
+}
+
+// Exists checks if the project already exists
+func (pl *ProjectLogic) Exists(projectName string) bool {
+	var project = Project{}
+	if err := pl.GetByName(projectName, &project); err != nil {
+		return false
+	}
+	return true
 }
 
 // CreateFilesFolder creates a 'files' folder inside the

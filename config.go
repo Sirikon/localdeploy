@@ -12,15 +12,24 @@ type Config struct {
 	Workspace string
 }
 
-// Init initializes the configuration based on
+// InitConfig initializes the configuration based on
 // runtime info and environment variables
-func (c *Config) Init() {
+func InitConfig() Config {
+	c := Config{}
 	c.OS = runtime.GOOS
 	c.PathSep = string(os.PathSeparator)
+	c.Workspace = initConfigWorkspace()
+	return c
+}
+
+func initConfigWorkspace() string {
 	var workspace = os.Getenv("MOLLY_WORKSPACE")
 	if workspace != "" {
-		c.Workspace = workspace
-	} else {
-		c.Workspace = "/srv/molly"
+		return workspace
 	}
+
+	if runtime.GOOS == "windows" {
+		return "C:\\molly"
+	}
+	return "/srv/molly"
 }

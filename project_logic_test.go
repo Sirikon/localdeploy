@@ -14,6 +14,10 @@ func (m *ProjectLogicMock) GetByName(a string, b *Project) error {
 	args := m.Called(a, b)
 	return args.Error(0)
 }
+func (m *ProjectLogicMock) Exists(a string) bool {
+	args := m.Called(a)
+	return args.Bool(0)
+}
 func (m *ProjectLogicMock) CreateFilesFolder(a Project) error {
 	args := m.Called(a)
 	return args.Error(0)

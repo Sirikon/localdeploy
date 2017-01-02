@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"errors"
+
 	"github.com/urfave/cli"
 )
 
@@ -33,16 +35,21 @@ func (pa *ProjectActions) AddCLIAction(c *cli.Context) error {
 	if !pa.validateAddContext(c) {
 		return nil
 	}
-	return pa.StartServiceAction(c.Args().First())
+	return pa.AddAction(c.Args().First())
 }
 
 // AddAction will create a new project in system
 func (pa *ProjectActions) AddAction(projectName string) error {
 
-	randomToken := pa.projectLogic.GenerateRandomToken()
-	hashedToken, err := pa.projectLogic.HashToken(randomToken)
+	if pa.projectLogic.Exists(projectName) {
+		return errors.New("Project " + projectName + " already exists")
+	}
 
-	if err != nil {
+	randomToken := pa.projectLogic.GenerateRandomToken()
+	var hashedToken string
+	if hash, err := pa.projectLogic.HashToken(randomToken); err == nil {
+		hashedToken = hash
+	} else {
 		return err
 	}
 
@@ -51,22 +58,21 @@ func (pa *ProjectActions) AddAction(projectName string) error {
 		Token:   hashedToken,
 		Service: "molly-" + projectName,
 	}
+
 	if err := pa.projectLogic.CreateFilesFolder(project); err != nil {
-		return err
+		return errors.New("Error while creating the files folder:\n" + err.Error())
 	}
 	if err := pa.projectLogic.CreateDeploymentScript(project); err != nil {
-		return err
+		return errors.New("Error while creating the deployment script:\n" + err.Error())
 	}
 	if err := pa.projectLogic.CreateRunScript(project); err != nil {
-		return err
+		return errors.New("Error while creating the run script:\n" + err.Error())
 	}
 	if err := pa.projectLogic.CreateService(project); err != nil {
-		fmt.Println("Error while creating the service")
-		fmt.Println(err)
-		return err
+		return errors.New("Error while creating the service:\n" + err.Error())
 	}
 	if err := pa.projectLogic.Save(project); err != nil {
-		return err
+		return errors.New("Error while creating the project.yml file:\n" + err.Error())
 	}
 
 	fmt.Println("Automatically generated token:", randomToken)

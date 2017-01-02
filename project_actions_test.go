@@ -1,8 +1,9 @@
 package main
 
 import "testing"
+import "github.com/stretchr/testify/assert"
 
-func TestAddAction(t *testing.T) {
+func TestAddAction_Correct(t *testing.T) {
 	var projectLogic = &ProjectLogicMock{}
 
 	project := Project{
@@ -11,6 +12,7 @@ func TestAddAction(t *testing.T) {
 		Service: "molly-test",
 	}
 
+	projectLogic.On("Exists", "test").Return(false)
 	projectLogic.On("GenerateRandomToken").Return("123")
 	projectLogic.On("HashToken", "123").Return(project.Token, nil)
 	projectLogic.On("CreateFilesFolder", project).Return(nil)
@@ -23,6 +25,15 @@ func TestAddAction(t *testing.T) {
 
 	projectActions.AddAction(project.Name)
 
+	projectLogic.AssertExpectations(t)
+}
+
+func TestAddAction_WithExistingProject(t *testing.T) {
+	var projectLogic = &ProjectLogicMock{}
+	projectLogic.On("Exists", "test").Return(true)
+	var projectActions = ProjectActions{projectLogic}
+	err := projectActions.AddAction("test")
+	assert.EqualError(t, err, "Project test already exists")
 	projectLogic.AssertExpectations(t)
 }
 

@@ -8,10 +8,9 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	var config = Config{}
-	config.Init()
+	var config = InitConfig()
 
-	var serviceManager = SystemdServiceManager{}
+	var serviceManager = InitServiceManager()
 	var fileSystem = FileSystem{}
 	var projectPaths = ProjectPaths{config}
 	var projectLogic = &ProjectLogic{config, projectPaths, serviceManager, fileSystem}

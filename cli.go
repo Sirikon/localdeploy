@@ -46,7 +46,7 @@ func (c CLI) Init() {
 				{
 					Name:   "add",
 					Usage:  "adds a new project",
-					Action: c.projectActions.AddAction,
+					Action: c.projectActions.AddCLIAction,
 				},
 				{
 					Name:  "service",
