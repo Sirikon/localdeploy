@@ -34,9 +34,6 @@ vendor/
 molly
 debug
 
-# Visual Studio Code
-.vscode
-
 # Reports
 *.out
 report.xml
