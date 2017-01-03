@@ -5,11 +5,8 @@ import (
 	"io"
 	"math/rand"
 	"os"
-	"os/exec"
 
 	"golang.org/x/crypto/bcrypt"
-
-	yaml "gopkg.in/yaml.v2"
 )
 
 // IProjectLogic .
@@ -32,10 +29,12 @@ type IProjectLogic interface {
 
 // ProjectLogic logic related to projects
 type ProjectLogic struct {
-	Config         Config
-	projectPaths   IProjectPaths
-	serviceManager IServiceManager
-	fileSystem     IFileSystem
+	Config               Config
+	projectPaths         IProjectPaths
+	projectSerialization IProjectSerialization
+	serviceManager       IServiceManager
+	fileSystem           IFileSystem
+	cmd                  ICMD
 }
 
 // GetByName populates the given project with the existing one
@@ -49,7 +48,7 @@ func (pl *ProjectLogic) GetByName(projectName string, project *Project) error {
 		return err
 	}
 
-	if err := yaml.Unmarshal(projectFileBytes, &project); err != nil {
+	if err := pl.projectSerialization.Deserialize(projectFileBytes, project); err != nil {
 		return err
 	}
 
@@ -69,7 +68,8 @@ func (pl *ProjectLogic) Exists(projectName string) bool {
 // project's folder
 func (pl ProjectLogic) CreateFilesFolder(project Project) error {
 	var filesFolderPath = pl.projectPaths.GetFilesFolderPath(project)
-	if err := pl.fileSystem.MkdirAll(filesFolderPath, 0777); err != nil {
+	var folderPerm os.FileMode = 0777
+	if err := pl.fileSystem.MkdirAll(filesFolderPath, folderPerm); err != nil {
 		return err
 	}
 	return nil
@@ -95,13 +95,14 @@ func (pl ProjectLogic) RunDeploymentScript(project Project) error {
 	var deploymentScriptPath = pl.projectPaths.GetDeploymentScriptPath(project)
 	var filesFolderPath = pl.projectPaths.GetFilesFolderPath(project)
 
-	cmd := exec.Command("sh", deploymentScriptPath)
-	cmd.Dir = filesFolderPath
-	cmd.Env = pl.getDeploymentEnvVars(project)
+	var execParams = ExecParams{
+		Command: []string{"sh", deploymentScriptPath},
+		CWD:     filesFolderPath,
+		Env:     pl.getDeploymentEnvVars(project),
+	}
 
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New("There was an error running the deployment script: " + err.Error() + "\n" + string(out))
+	if out, err := pl.cmd.Exec(execParams); err != nil {
+		return errors.New("There was an error running the deployment script:\n\n " + err.Error() + "\n\nCommand Output:\n" + out)
 	}
 
 	return nil
@@ -171,7 +172,7 @@ func (pl ProjectLogic) Save(project Project) error {
 
 	var projectFileBytes []byte
 
-	if out, err := yaml.Marshal(project); err == nil {
+	if out, err := pl.projectSerialization.Serialize(project); err == nil {
 		projectFileBytes = out
 	} else {
 		return err
