@@ -7,6 +7,8 @@ import (
 	"github.com/urfave/cli"
 )
 
+var appVersion string
+
 // CLI .
 type CLI struct {
 	daemonAction   IDaemonAction
@@ -31,7 +33,7 @@ func (c CLI) Init() {
 	app.Name = "molly"
 	app.HelpName = "molly"
 	app.Usage = "Minimalistic local deployment tool"
-	app.Version = "0.0.1"
+	app.Version = appVersion
 
 	app.Commands = []cli.Command{
 		{

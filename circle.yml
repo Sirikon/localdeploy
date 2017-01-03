@@ -10,8 +10,8 @@ dependencies:
     - mkdir -p "$IMPORT_PATH"
     - ln -sf "$(pwd)" "$APP_PATH"
     - cd "$APP_PATH" && glide install
-    - cd "$APP_PATH" && go build -v
-    - cd "$APP_PATH" && env GOOS=windows GOARCH=amd64 go build -v
+    - cd "$APP_PATH" && go build -v -ldflags "-X main.appVersion=$(< version.txt)"
+    - cd "$APP_PATH" && env GOOS=windows GOARCH=amd64 go build -v -ldflags "-X main.appVersion=$(< version.txt)"
 test:
   override:
     - go get -u github.com/jstemmer/go-junit-report
