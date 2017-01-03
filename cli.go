@@ -33,7 +33,11 @@ func (c CLI) Init() {
 	app.Name = "molly"
 	app.HelpName = "molly"
 	app.Usage = "Minimalistic local deployment tool"
-	app.Version = appVersion
+	if appVersion != "" {
+		app.Version = appVersion
+	} else {
+		app.Version = "DEVELOPMENT BUILD"
+	}
 
 	app.Commands = []cli.Command{
 		{
