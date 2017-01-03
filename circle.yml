@@ -21,8 +21,8 @@ general:
   artifacts:
     - "molly" # Linux executable
     - "molly.exe" # Windows executable
-# deployment:
-#   master:
-#     branch: master
-#     commands:
-#       - ./deploy.sh
+deployment:
+  master:
+    branch: master
+    commands:
+      - ./deploy.sh
