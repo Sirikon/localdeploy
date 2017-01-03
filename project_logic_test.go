@@ -74,7 +74,7 @@ func (m *ProjectLogicMock) CheckToken(a Project, b string) bool {
 	return args.Bool(0)
 }
 
-func TestProjectLogic_Exists(t *testing.T) {
+func getProjectLogicMockedDependencies() (Config, *ProjectPaths, *ProjectSerializationMock, *ServiceManagerMock, *FileSystemMock, *CMDMock) {
 	var config = Config{}
 	config.OS = "linux"
 	config.PathSep = "/"
@@ -85,6 +85,12 @@ func TestProjectLogic_Exists(t *testing.T) {
 	var serviceManager = &ServiceManagerMock{}
 	var fileSystem = &FileSystemMock{}
 	var cmd = &CMDMock{}
+
+	return config, projectPaths, projectSerialization, serviceManager, fileSystem, cmd
+}
+
+func TestProjectLogic_Exists(t *testing.T) {
+	config, projectPaths, projectSerialization, serviceManager, fileSystem, cmd := getProjectLogicMockedDependencies()
 
 	var project = Project{}
 	var projectBytes = []byte{0xAA, 0xBB, 0xCC}
@@ -102,16 +108,7 @@ func TestProjectLogic_Exists(t *testing.T) {
 }
 
 func TestProjectLogic_CreateFilesFolderAndRunDeploymentScript(t *testing.T) {
-	var config = Config{}
-	config.OS = "linux"
-	config.PathSep = "/"
-	config.Workspace = "/srv/molly"
-
-	var projectPaths = &ProjectPaths{config}
-	var projectSerialization = &ProjectSerializationMock{}
-	var serviceManager = &ServiceManagerMock{}
-	var fileSystem = &FileSystemMock{}
-	var cmd = &CMDMock{}
+	config, projectPaths, projectSerialization, serviceManager, fileSystem, cmd := getProjectLogicMockedDependencies()
 
 	var project = Project{
 		Name: "test",
@@ -137,16 +134,7 @@ func TestProjectLogic_CreateFilesFolderAndRunDeploymentScript(t *testing.T) {
 }
 
 func TestProjectLogic_RunDeploymentScriptWithError(t *testing.T) {
-	var config = Config{}
-	config.OS = "linux"
-	config.PathSep = "/"
-	config.Workspace = "/srv/molly"
-
-	var projectPaths = &ProjectPaths{config}
-	var projectSerialization = &ProjectSerializationMock{}
-	var serviceManager = &ServiceManagerMock{}
-	var fileSystem = &FileSystemMock{}
-	var cmd = &CMDMock{}
+	config, projectPaths, projectSerialization, serviceManager, fileSystem, cmd := getProjectLogicMockedDependencies()
 
 	var project = Project{
 		Name: "test",
@@ -173,16 +161,7 @@ func TestProjectLogic_RunDeploymentScriptWithError(t *testing.T) {
 }
 
 func TestProjectLogic_CreateRunAndDeploymentScripts(t *testing.T) {
-	var config = Config{}
-	config.OS = "linux"
-	config.PathSep = "/"
-	config.Workspace = "/srv/molly"
-
-	var projectPaths = &ProjectPaths{config}
-	var projectSerialization = &ProjectSerializationMock{}
-	var serviceManager = &ServiceManagerMock{}
-	var fileSystem = &FileSystemMock{}
-	var cmd = &CMDMock{}
+	config, projectPaths, projectSerialization, serviceManager, fileSystem, cmd := getProjectLogicMockedDependencies()
 
 	var project = Project{
 		Name: "test",
