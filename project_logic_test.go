@@ -33,9 +33,9 @@ func (m *ProjectLogicMock) CleanFilesFolder(a Project) error {
 	args := m.Called(a)
 	return args.Error(0)
 }
-func (m *ProjectLogicMock) RunDeploymentScript(a Project) error {
+func (m *ProjectLogicMock) RunDeploymentScript(a Project) (string, error) {
 	args := m.Called(a)
-	return args.Error(0)
+	return args.String(0), args.Error(1)
 }
 func (m *ProjectLogicMock) CreateDeploymentScript(a Project) error {
 	args := m.Called(a)
@@ -153,9 +153,9 @@ func TestProjectLogic_RunDeploymentScriptWithError(t *testing.T) {
 
 	var projectLogic = ProjectLogic{config, projectPaths, projectSerialization, serviceManager, fileSystem, cmd}
 
-	err := projectLogic.RunDeploymentScript(project)
+	_, err := projectLogic.RunDeploymentScript(project)
 
-	assert.EqualError(t, err, "There was an error running the deployment script:\n\n EXECUTION_ERROR\n\nCommand Output:\nOUTPUT_ERROR")
+	assert.EqualError(t, err, "There was an error running the deployment script:\n\n EXECUTION_ERROR")
 
 	fileSystem.AssertExpectations(t)
 }

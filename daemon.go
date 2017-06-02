@@ -72,7 +72,9 @@ func (da DaemonAction) Run(c *cli.Context) error {
 		})
 		p.Then(func() error {
 			deploymentLog.WriteString("- Running deployment script\n")
-			return da.projectLogic.RunDeploymentScript(project)
+			output, err := da.projectLogic.RunDeploymentScript(project)
+			deploymentLog.WriteString(output + "\n")
+			return err
 		})
 		p.Then(func() error {
 			deploymentLog.WriteString("- Restarting the service\n")

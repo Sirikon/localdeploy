@@ -15,7 +15,7 @@ type IProjectLogic interface {
 	Exists(string) bool
 	CreateFilesFolder(Project) error
 	CleanFilesFolder(Project) error
-	RunDeploymentScript(Project) error
+	RunDeploymentScript(Project) (string, error)
 	CreateDeploymentScript(Project) error
 	CreateRunScript(Project) error
 	StoreArtifact(Project, io.Reader) error
@@ -86,10 +86,10 @@ func (pl ProjectLogic) CleanFilesFolder(project Project) error {
 }
 
 // RunDeploymentScript will execute the project's deployment script (deploy.sh)
-func (pl ProjectLogic) RunDeploymentScript(project Project) error {
+func (pl ProjectLogic) RunDeploymentScript(project Project) (string, error) {
 
 	if err := pl.CleanFilesFolder(project); err != nil {
-		return errors.New("Couldn't clean the files folder: " + err.Error())
+		return "", errors.New("Couldn't clean the files folder: " + err.Error())
 	}
 
 	var deploymentScriptPath = pl.projectPaths.GetDeploymentScriptPath(project)
@@ -101,11 +101,13 @@ func (pl ProjectLogic) RunDeploymentScript(project Project) error {
 		Env:     pl.getDeploymentEnvVars(project),
 	}
 
-	if out, err := pl.cmd.Exec(execParams); err != nil {
-		return errors.New("There was an error running the deployment script:\n\n " + err.Error() + "\n\nCommand Output:\n" + out)
+	out, err := pl.cmd.Exec(execParams)
+
+	if err != nil {
+		return out, errors.New("There was an error running the deployment script:\n\n " + err.Error())
 	}
 
-	return nil
+	return out, nil
 }
 
 // CreateDeploymentScript created the default deploy script
