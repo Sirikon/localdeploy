@@ -1,0 +1,7 @@
+version: '2'
+services:
+  molly:
+    build: .
+    volumes:
+     - .:/go/src/github.com/Sirikon/molly
+    working_dir: /go/src/github.com/Sirikon/molly
